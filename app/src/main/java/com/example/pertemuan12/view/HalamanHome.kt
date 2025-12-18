@@ -37,7 +37,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.pertemuan12.R
-import com.example.pertemuan12.model.DataSiswa
+import com.example.pertemuan12.modeldata.DataSiswa
 import com.example.pertemuan12.uicontroller.route.DestinasiHome
 import com.example.pertemuan12.viewmodel.HomeViewModel
 import com.example.pertemuan12.viewmodel.StatusUiSiswa
