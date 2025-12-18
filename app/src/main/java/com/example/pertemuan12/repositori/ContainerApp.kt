@@ -2,6 +2,7 @@ package com.example.pertemuan12.repositori
 
 
 import android.app.Application
+import com.example.pertemuan12.apiservice.ServiceApiSiswa
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
