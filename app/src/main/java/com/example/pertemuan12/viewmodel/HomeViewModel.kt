@@ -6,7 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.pertemuan12.model.DataSiswa
+import com.example.pertemuan12.modeldata.DataSiswa
 import com.example.pertemuan12.repositori.RepositoryDataSiswa
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
