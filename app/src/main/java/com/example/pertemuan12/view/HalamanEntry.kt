@@ -25,8 +25,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.pertemuan12.R
-import com.example.pertemuan12.model.DetailSiswa
-import com.example.pertemuan12.model.UIStateSiswa
+import com.example.pertemuan12.modeldata.DetailSiswa
+import com.example.pertemuan12.modeldata.UIStateSiswa
 import com.example.pertemuan12.uicontroller.route.DestinasiEntry
 import com.example.pertemuan12.viewmodel.EntryViewModel
 import com.example.pertemuan12.viewmodel.provider.PenyediaViewModel
