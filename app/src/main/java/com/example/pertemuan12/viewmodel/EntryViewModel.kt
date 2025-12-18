@@ -5,9 +5,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.example.pertemuan12.model.DetailSiswa
-import com.example.pertemuan12.model.UIStateSiswa
-import com.example.pertemuan12.model.toDataSiswa
+import com.example.pertemuan12.modeldata.DetailSiswa
+import com.example.pertemuan12.modeldata.UIStateSiswa
+import com.example.pertemuan12.modeldata.toDataSiswa
 import com.example.pertemuan12.repositori.RepositoryDataSiswa
 
 class EntryViewModel(private val repositoryDataSiswa: RepositoryDataSiswa) : ViewModel() {
@@ -33,7 +33,7 @@ class EntryViewModel(private val repositoryDataSiswa: RepositoryDataSiswa) : Vie
         if (validasiInput()) {
             try {
 
-                repositoryDataSiswa.insertSiswa(uiStateSiswa.detailSiswa.toDataSiswa())
+                repositoryDataSiswa.postDataSiswa(uiStateSiswa.detailSiswa.toDataSiswa())
                 println("Sukses Tambah Data")
             } catch (e: Exception) {
                 println("Gagal tambah data: ${e.message}")
