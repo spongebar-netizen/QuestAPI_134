@@ -1,6 +1,6 @@
 package com.example.pertemuan12.view
 
-import EntrySiswaBody
+
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -11,6 +11,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.pertemuan12.uicontroller.route.DestinasiEdit
 import com.example.pertemuan12.viewmodel.EditViewModel
+import com.example.pertemuan12.viewmodel.provider.PenyediaViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)

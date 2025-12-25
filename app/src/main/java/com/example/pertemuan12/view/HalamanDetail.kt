@@ -1,106 +1,135 @@
 package com.example.pertemuan12.view
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.pertemuan12.R
+import com.example.pertemuan12.modeldata.DataSiswa
 import com.example.pertemuan12.uicontroller.route.DestinasiDetail
+import com.example.pertemuan12.viewmodel.DetailViewModel
+import com.example.pertemuan12.viewmodel.StatusUIDetail
 import com.example.pertemuan12.viewmodel.provider.PenyediaViewModel
+import kotlinx.coroutines.launch
 
+
+
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailSiswaScreen(
-    idSiswa: Int,
+    navigateToEditItem: (Int) -> Unit,
     navigateBack: () -> Unit,
-    navigateToEdit: (Int) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: DetailViewModel = viewModel(factory = PenyediaViewModel.Factory)
 ) {
-    val uiState by viewModel.detailUiState.collectAsState()
-
     Scaffold(
         topBar = {
-            CostumeTopAppBar(
+            SiswaTopAppBar(
                 title = stringResource(DestinasiDetail.titleRes),
                 canNavigateBack = true,
                 navigateUp = navigateBack
             )
         },
         floatingActionButton = {
+            val uiState = viewModel.statusUIDetail
             FloatingActionButton(
-                onClick = { navigateToEdit(idSiswa) },
+                onClick = {
+                    when(uiState) {
+                        is StatusUIDetail.Success -> navigateToEditItem(uiState.satusiswa.id)
+                        else -> {}
+                    }
+                },
                 shape = MaterialTheme.shapes.medium,
                 modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large))
             ) {
                 Icon(
-                    imageVector = Icons.Default.Edit,
-                    contentDescription = stringResource(R.string.edit_siswa)
+                    imageVector = Icons.Filled.Edit,
+                    contentDescription = stringResource(R.string.update)
                 )
+
+
             }
-        }, modifier = modifier
+        },
+        modifier = modifier
     ) { innerPadding ->
-        BodyDetailSiswa(
-            detailUiState = uiState,
-            modifier = Modifier.padding(innerPadding),
-            onDeleteClick = {
-                viewModel.deleteSiswa()
-                navigateBack()
-            }
+        val coroutineScope = rememberCoroutineScope()
+        BodyDetailDataSiswa(
+            statusUIDetail = viewModel.statusUIDetail,
+            onDelete = {
+                coroutineScope.launch {
+                    viewModel.hapusSatuSiswa()
+                    navigateBack()
+                }
+            },
+            modifier = Modifier
+                .padding(innerPadding)
+                .verticalScroll(rememberScrollState())
         )
     }
 }
 
-
-
-
 @Composable
-private fun BodyDetailSiswa(
-    detailUiState: DetailUiState,
-    modifier: Modifier = Modifier,
-    onDeleteClick: () -> Unit
+private fun BodyDetailDataSiswa(
+    statusUIDetail: StatusUIDetail,
+    onDelete: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    var deleteConfirmationRequired by rememberSaveable { mutableStateOf(false) }
-
     Column(
         modifier = modifier.padding(dimensionResource(id = R.dimen.padding_medium)),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium))
     ) {
-        when (detailUiState) {
-            is DetailUiState.Loading -> {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
-                }
-            }
-            is DetailUiState.Success -> {
-                ItemDetailSiswa(
-                    siswa = detailUiState.siswa,
+        var deleteConfirmationRequired by rememberSaveable { mutableStateOf(false) }
+        when(statusUIDetail) {
+            is StatusUIDetail.Success -> {
+                DetailDataSiswa(
+                    siswa = statusUIDetail.satusiswa,
                     modifier = Modifier.fillMaxWidth()
                 )
-                OutlinedButton(
-                    onClick = { deleteConfirmationRequired = true },
-                    shape = MaterialTheme.shapes.small,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(stringResource(R.string.delete))
-                }
             }
-            is DetailUiState.Error -> {
-                Text(text = "Error loading detail")
-            }
+            else -> {}
+        }
+        OutlinedButton(
+            onClick = { deleteConfirmationRequired = true },
+            shape = MaterialTheme.shapes.small,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(stringResource(R.string.delete))
         }
         if (deleteConfirmationRequired) {
             DeleteConfirmationDialog(
                 onDeleteConfirm = {
                     deleteConfirmationRequired = false
-                    onDeleteClick()
+                    onDelete()
                 },
                 onDeleteCancel = { deleteConfirmationRequired = false },
                 modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_medium))
@@ -110,7 +139,7 @@ private fun BodyDetailSiswa(
 }
 
 @Composable
-fun ItemDetailSiswa(
+fun DetailDataSiswa(
     siswa: DataSiswa,
     modifier: Modifier = Modifier
 ) {
@@ -127,22 +156,41 @@ fun ItemDetailSiswa(
                 .padding(dimensionResource(id = R.dimen.padding_medium)),
             verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium))
         ) {
-            ComponentDetailSiswa(label = "NIM", value = siswa.nim)
-            ComponentDetailSiswa(label = "Nama", value = siswa.nama)
-            ComponentDetailSiswa(label = "Alamat", value = siswa.alamat)
-            ComponentDetailSiswa(label = "Jenis Kelamin", value = siswa.jenis_kelamin)
-            ComponentDetailSiswa(label = "Kelas", value = siswa.kelas)
+            BarisDetailData(
+                labelResID = R.string.nama1,
+                itemDetail = siswa.nama,
+                modifier = Modifier.padding(
+                    horizontal = dimensionResource(id = R.dimen.padding_medium)
+                )
+            )
+            BarisDetailData(
+                labelResID = R.string.alamat1,
+                itemDetail = siswa.alamat,
+                modifier = Modifier.padding(
+                    horizontal = dimensionResource(id = R.dimen.padding_medium)
+                )
+            )
+            BarisDetailData(
+                labelResID = R.string.telpon1,
+                itemDetail = siswa.telpon,
+                modifier = Modifier.padding(
+                    horizontal = dimensionResource(id = R.dimen.padding_medium)
+                )
+            )
         }
     }
 }
 
 @Composable
-fun ComponentDetailSiswa(
-    label: String, value: String, modifier: Modifier = Modifier
+private fun BarisDetailData(
+    @StringRes labelResID: Int,
+    itemDetail: String,
+    modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier) {
-        Text(text = label, style = MaterialTheme.typography.labelLarge)
-        Text(text = value, style = MaterialTheme.typography.bodyLarge)
+    Row(modifier = modifier) {
+        Text(stringResource(labelResID))
+        Spacer(modifier = Modifier.weight(1f))
+        Text(text = itemDetail, fontWeight = FontWeight.Bold)
     }
 }
 
@@ -155,7 +203,7 @@ private fun DeleteConfirmationDialog(
     AlertDialog(
         onDismissRequest = { /* Do nothing */ },
         title = { Text(stringResource(R.string.attention)) },
-        text = { Text(stringResource(R.string.delete_confirmation)) },
+        text = { Text(stringResource(R.string.tanya)) },
         modifier = modifier,
         dismissButton = {
             TextButton(onClick = onDeleteCancel) {
