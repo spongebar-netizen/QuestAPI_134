@@ -1,5 +1,3 @@
-
-
 @file:OptIn(InternalSerializationApi::class)
 package com.example.pertemuan12.viewmodel
 
